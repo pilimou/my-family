@@ -1,0 +1,4 @@
+lineBot:
+  nike:
+    channelToken: ${sm://nike-channelToken}
+    channelSecret: ${sm://nike-channelSecret}
