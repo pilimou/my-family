@@ -30,6 +30,9 @@ public class FridgeEntity {
 	@Field("processDateStr")
 	private String processDateStr;
 
+	@Field("state")
+	private String state;
+	
 	public String getId() {
 		return id;
 	}
@@ -84,6 +87,14 @@ public class FridgeEntity {
 
 	public void setProcessDateStr(String processDateStr) {
 		this.processDateStr = processDateStr;
+	}
+
+	public String getState() {
+		return state;
+	}
+
+	public void setState(String state) {
+		this.state = state;
 	}
 
 	

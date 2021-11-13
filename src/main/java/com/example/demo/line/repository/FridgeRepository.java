@@ -10,7 +10,9 @@ import com.example.demo.line.entity.FridgeEntity;
 @Repository
 public interface FridgeRepository extends MongoRepository<FridgeEntity, String>{
 	
-//	List<FridgeEntity> findByLike(String itemName);
+	List<FridgeEntity> findByItemName(String itemName);
 	
+//	List<FridgeEntity> findByLineUserId(String lineUserId);
 	
+	void deleteFridgeEntityById(String id);
 }

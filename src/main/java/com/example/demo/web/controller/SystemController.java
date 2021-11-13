@@ -9,10 +9,10 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 @Controller
-@RequestMapping(value = "/sys")
+@RequestMapping
 public class SystemController {
 	
-	@GetMapping("/sign-in")
+	@GetMapping("/sys/sign-in")
 	public String login(HttpSession session) {
 		String error = (String) session.getAttribute("error");
 		if(null != error) {
@@ -24,10 +24,15 @@ public class SystemController {
 		return "indexLogin";
 	}
 	
-	@GetMapping("/wake_up")
+	@GetMapping("/sys/wake_up")
 	@ResponseBody
 	public String wake_up() {
 		return "still alive";
 	}
+	
+	@GetMapping("/favicon.ico")
+    @ResponseBody
+    void returnNoFavicon() {
+    }
 	
 }

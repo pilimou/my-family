@@ -21,11 +21,14 @@ public class AppUserEntity {
 	@Field("roleid")
 	private String roleId;
 	
-	@Field("linecode")
-	private String lineCode;
+	@Field("lineUserId")
+	private String lineUserId;
 	
-	@Field("lineid")
-	private String lineId;
+	@Field("lineUserName")
+	private String lineUserName;
+	
+	@Field("createDate")
+	private String createDate;
 
 	public String getId() {
 		return id;
@@ -59,21 +62,31 @@ public class AppUserEntity {
 		this.roleId = roleId;
 	}
 
-	public String getLineCode() {
-		return lineCode;
+	public String getLineUserId() {
+		return lineUserId;
 	}
 
-	public void setLineCode(String lineCode) {
-		this.lineCode = lineCode;
+	public void setLineUserId(String lineUserId) {
+		this.lineUserId = lineUserId;
 	}
 
-	public String getLineId() {
-		return lineId;
+	public String getLineUserName() {
+		return lineUserName;
 	}
 
-	public void setLineId(String lineId) {
-		this.lineId = lineId;
+	public void setLineUserName(String lineUserName) {
+		this.lineUserName = lineUserName;
 	}
+
+	public String getCreateDate() {
+		return createDate;
+	}
+
+	public void setCreateDate(String createDate) {
+		this.createDate = createDate;
+	}
+
+	
 	
 	
 }

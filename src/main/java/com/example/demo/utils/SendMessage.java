@@ -3,6 +3,7 @@ package com.example.demo.utils;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpEntity;
@@ -28,6 +29,7 @@ public class SendMessage {
 	
 	private final static String  lineReplyUrl = "https://api.line.me/v2/bot/message/reply";
 	private final static String  lineBroadcast = "https://api.line.me/v2/bot/message/broadcast";
+	private final static String  linePush = "https://api.line.me/v2/bot/message/push";
 
 	static {
 		restTemplate = new RestTemplate();
@@ -49,6 +51,40 @@ public class SendMessage {
 				String.class);
 
 	}
+	
+	/**
+	 * 全體推播
+	 * 
+	 * @param replyJson
+	 * @param channelToken
+	 * @param lineReplyUrl
+	 */
+	public static void broadcastMessage(String replyJson, String channelToken) throws Exception {
+		
+		logger.info("replyJson = {}", replyJson);
+		
+		restTemplate.exchange(lineBroadcast, HttpMethod.POST,
+				new HttpEntity<>(replyJson, getHttpHeaders(channelToken)),
+				String.class);
+
+	}
+	
+	/**
+	 * 推播to a user, group, or room
+	 * 
+	 * @param replyJson
+	 * @param channelToken
+	 * @param lineReplyUrl
+	 */
+	public static void pushMessage(String replyJson, String channelToken) throws Exception {
+		
+		logger.info("replyJson = {}", replyJson);
+		
+		restTemplate.exchange(linePush, HttpMethod.POST,
+				new HttpEntity<>(replyJson, getHttpHeaders(channelToken)),
+				String.class);
+
+	}
 
 	//header
 	private static HttpHeaders getHttpHeaders(String channelToken) {
@@ -59,18 +95,32 @@ public class SendMessage {
 	}
 
 	//文字
-	public static String replyMessageTextJson(String replyToken, String message) throws Exception{
+	public static String replyMessageTextJson(String messageActionType, String replyToken, String[] messages) throws Exception{
 		Reply reply = new Reply();
-		List<TextMessages> textList = new ArrayList<>();
-		TextMessages textMessages = new TextMessages();
-		textMessages.setType("text");
-		textMessages.setText(message);
-		textList.add(textMessages);
+		List<TextMessages> textList = replyMessage(messages);
 		reply.setMessages(textList);
-		reply.setReplyToken(replyToken);
+		if (StringUtils.equals(messageActionType, "reply")) {
+			reply.setReplyToken(replyToken);
+		} else if (StringUtils.equals(messageActionType, "broadcast")) {
+			
+		} else if(StringUtils.equals(messageActionType, "to")) {
+			reply.setTo(replyToken);
+		}
 		return new ObjectMapper().writeValueAsString(reply);
 	}
 	
+	private static List<TextMessages> replyMessage(String[] messages){
+		List<TextMessages> textList = new ArrayList<>();
+		for(String message : messages) {
+			TextMessages textMessages = new TextMessages();
+			textMessages.setType("text");
+			textMessages.setText(message);
+			textList.add(textMessages);
+		}
+		return textList;
+	}
+	
+	//quickReply日期
 	public static String quickReplyMessageTextJson_dateTime(String replyToken, String message, String replyData) throws Exception{
 	
 		
@@ -102,5 +152,7 @@ public class SendMessage {
 		
 		return new ObjectMapper().writeValueAsString(reply);
 	}
+	
+	
 
 }

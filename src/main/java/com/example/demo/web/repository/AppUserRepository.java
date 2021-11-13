@@ -9,4 +9,5 @@ import com.example.demo.web.entity.AppUserEntity;
 public interface AppUserRepository extends MongoRepository<AppUserEntity, String>{
 	
 	AppUserEntity findByAccount(String account);
+	AppUserEntity findByLineUserId(String lineUserId);
 }

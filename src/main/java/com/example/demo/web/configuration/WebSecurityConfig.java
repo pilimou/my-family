@@ -1,4 +1,4 @@
-package com.example.demo.web.configuration.security;
+package com.example.demo.web.configuration;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
@@ -9,6 +9,9 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+
+import com.example.demo.web.security.FamilyAuthenticationFailHandler;
+import com.example.demo.web.security.FamilyAuthenticationSuccessHandler;
 
 @Configuration
 @EnableWebSecurity
@@ -38,7 +41,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter{
 	
 	@Override
 	public void configure(WebSecurity web) throws Exception {
-		web.ignoring().antMatchers("/sys/wake_up", "/sys/sign-in", "/line/**","/js/**", "/fonts/**", "/css/**", "/image/**", "/images/**", "/**/favicon.ico", "/styles/**", "/vendors/**");
+		web.ignoring().antMatchers("/favicon.ico", "/sys/wake_up", "/sys/sign-in", "/line/**","/js/**", "/fonts/**", "/css/**", "/image/**", "/images/**", "/**/favicon.ico", "/styles/**", "/vendors/**");
 	}
 	
 	@Override

@@ -1,4 +1,4 @@
-package com.example.demo.web.configuration.security;
+package com.example.demo.web.security;
 
 import java.io.IOException;
 

@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:th="http://www.thymeleaf.org"
+	xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<title>body</title>
+</head>
+<body>
+	<div>
+		<div class="title">
+			<span>查詢</span>			
+		</div>
+		<br>
+		<table id="mainTable" border="0">
+			<tr>
+				<td>
+					<span>種類</span>
+				</td>
+				<td>
+					<select id="itemName" name="itemName" >
+						<option value="all">--全部--</option>
+				</select>
+				</td>
+			</tr>
+		</table>
+	</div>
+	<br>
+	<div>
+		<input type="button" id="query" value="查詢"/>
+		<input type="button" id="delete" style="display:none;" value="刪除"/>	
+	</div>
+	
+	
+
+	<script th:inline="javascript">
+	/*<![CDATA[*/
+	var buttonAuthority = [[${session.authority}]];
+	/*]]>*/ 
+	if(buttonAuthority == 4){
+		$("#delete").show();
+	}
+	
+	//撈下拉選單
+	var itemSelect = itemSelectSearch();
+	initData();
+	         
+	function initData() {
+		$.each(itemSelect.queryItemNameListOut, function (index, value) {
+			$("#itemName").append($("<option></option>").attr("value", value.itemName).text(value.itemName));
+					
+		});	
+	}	
+	
+	//物品清單
+	function itemSelectSearch(){
+		var itemSelect = $.ajax({
+			url : "/fridge/queryItemList",
+			method : "post",
+			contentType : "application/json",
+			data : JSON.stringify(),
+			async : false,
+			success : function(data) {
+							
+			}
+		}).responseText;
+		return $.parseJSON(itemSelect);
+	}  
+	
+	
+	
+		$("#query").click(function(){
+			getDataTable();
+		});
+		
+		var dataTable1;
+		var isCallApi = false;
+		function getDataTable(){
+			if(isCallApi) {
+				dataTable1.ajax.reload();
+			} else {
+				isCallApi = true;
+					dataTable1 = $("#dataTable1").DataTable({
+						 ajax: {
+					            url: "/fridge/queryFridgeListIn",
+					            type: "POST",
+					            contentType: "application/json",
+					            dataSrc: "queryFridgeVOList",
+					            data: function(d) {
+					            	var data = {
+					            		itemName: $("#itemName").val()
+					            	};
+					              	return JSON.stringify(data);
+					            }
+						},
+						columns: [
+							{
+								data: "id" , visible: false
+							},
+							{
+								data: "lineUserId" , visible: false
+							},
+							{
+								data: "lineUserName"
+							},
+							{
+								data: "itemName"
+							},
+							{
+								data: "expirationDateStr"
+							},
+							{
+								data: "processDateStr"
+							},
+							{
+								data: "state"
+							}
+						],
+						columnDefs: [
+				            {
+				              className: "dt-center",
+				              targets: "_all"
+				      	}],
+				      	lengthChange: false,
+				        "iDisplayLength": 10,
+				        "select" : true,
+				        searching: false,
+				        scrollX: true, 
+				        order: [4, 'desc'],
+				        language:{
+				        	select: {
+					            rows: {
+					            	_: ' 已選擇 %d 列',
+					                0: '尚未選擇',
+					                1: '已選擇1列'
+					        	}
+				        	},
+				          	sInfo: "顯示第 _START_ 至 _END_ 筆,共 _TOTAL_ 筆",
+				          	sInfoEmpty: "顯示第 0 至 0 筆,共 0 筆",
+				          	zeroRecords: "查無資料", 
+				          	oPaginate: {
+							    sFirst: "首頁",
+							    sPrevious: "上頁",
+							    sNext: "下頁",
+							    sLast: "尾頁"
+							}
+				      	}		     
+					});
+					$('#tabs-1').show();
+			}
+		}
+	
+	var rowData_record_ids;
+	$("#delete").click(function(){
+		if(!isCallApi){
+			alert('請先查詢要刪除之資料。');
+		} else {
+			if(dataTable1.row({ selected: true }).data() == null){
+	    		alert('請選擇要刪除的資料。');
+	    	} else {
+	    		var checkDelete = confirm('確定刪除');
+	    		if(checkDelete){
+	    			//刪除ajax
+	    			deleteSchedule();
+	    		} else {
+	    			return;
+	    		}
+	    	}
+		}
+		
+	});
+	
+	//刪除ajax
+	function deleteSchedule(){
+		var rowData_ids = "";
+		var rowData = dataTable1.rows({ selected: true }).data().toArray();
+			$.each(rowData, function (index, value) {
+				rowData_ids += value.id + ",";		
+			});	
+		rowData_ids = rowData_ids.substring(0, rowData_ids.length - 1);
+
+		var deleteFridgeItemIn = new Object();
+		deleteFridgeItemIn.id = rowData_ids;
+		$.ajax({
+		 	url: '/fridge/deleteFridgeItemListIn',
+		 	type: "POST",
+            datatype: "json",
+            contentType: "application/json; charset=utf-8",
+            traditional:true,
+            data: JSON.stringify(deleteFridgeItemIn),
+		}).done(function(data){
+			if(null != data && "s" == data){
+				alert('刪除成功!')
+				dataTable1.ajax.reload();
+			}else{
+				alert('刪除失敗!')
+			}
+		}).fail(function(){
+			alert('刪除失敗!')
+		});
+	}
+	</script>
+	
+	<div class="txn-query-area">
+		<div class="col-xs-12 txn-query-title2">
+			
+		</div>
+		<div id="tabs-1" style="display: none">
+			<table id="dataTable1" class="display" cellspacing="0" width="100%">
+				<thead>
+					<tr>
+						<th>ID</th>
+						<th>userID</th>
+						<th>建立者</th>
+						<th>物品</th>
+						<th>保存期限</th>
+						<th>建立日期</th>
+						<th>保存狀況</th>
+					</tr>
+				</thead>
+			</table>
+		</div>
+	</div>
+</body>
+</html>

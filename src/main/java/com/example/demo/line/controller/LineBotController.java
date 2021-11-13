@@ -101,7 +101,12 @@ public class LineBotController {
 			return new ResponseEntity<String>(HttpStatus.OK);
 		} else {
 			LineMessageIn lineMessageIn = new ObjectMapper().readValue(requestBody, LineMessageIn.class);
-			lineMessageService.processLineMessage(lineMessageIn, channelToken);		
+			try {
+				lineMessageService.processLineMessage(lineMessageIn, channelToken);		
+				
+			} catch(Exception e) {
+				
+			}
 		}
 		
 		return new ResponseEntity<String>(HttpStatus.OK);
