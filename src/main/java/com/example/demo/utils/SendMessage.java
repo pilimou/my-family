@@ -17,7 +17,6 @@ import com.example.demo.line.vo.out.Reply;
 import com.example.demo.line.vo.out.TextMessages;
 import com.example.demo.line.vo.out.quickreply.Action;
 import com.example.demo.line.vo.out.quickreply.Items;
-import com.example.demo.line.vo.out.quickreply.QReply;
 import com.example.demo.line.vo.out.quickreply.QuickReply;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -152,7 +151,6 @@ public class SendMessage {
 		
 		return new ObjectMapper().writeValueAsString(reply);
 	}
-	
 	
 
 }

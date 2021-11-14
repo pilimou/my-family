@@ -7,6 +7,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.threeten.bp.LocalDateTime;
@@ -42,47 +43,54 @@ public class LineMessageServiceImpl implements LineMessageService, MessageEventS
 		for(Events event : lineMessageIn.getEvents()) {
 			if (null != event && null != event.getType()) {
 				eventType = event.getType();
-				
-				//被加好友時
-				if(StringUtils.equals(eventType, "follow")) {
+				//群組
+				if(null != event.getSource() && StringUtils.equals("group", event.getSource().getType())) {
+					return new ResponseEntity<String>(HttpStatus.OK);
+				//個人	
+				} else if(null != event.getSource() && StringUtils.equals("user", event.getSource().getType())) {
 					
-					this.followEvent(event, channelToken);
-				
-				//被封鎖時
-				} else if(StringUtils.equals(eventType, "unfollow")) {
-				
-					
-				
-				//message
-				} else if(StringUtils.equals(eventType, "message")) {
-				
-					this.messageEvent(event, channelToken);
-				
-				//機器人被加入群組/聊天室
-				} else if(StringUtils.equals(eventType, "join")) {
-					
-					
-					
-				//機器人已離開群組/聊天室
-				} else if(StringUtils.equals(eventType, "leave")) {
-					
-					
-					
-				//使用者加入群組/聊天室	
-				} else if(StringUtils.equals(eventType, "memberJoined")) {
-					
-					
-					
-				//使用者加入群組/聊天室	
-				} else if(StringUtils.equals(eventType, "memberLeft")) {
-					
-					
-				//使用者點選quickReply回傳的資料
-				} else if(StringUtils.equals(eventType, "postback")) {
-					
-					this.postbackEvent(event, channelToken);
-					
+					//被加好友時
+					if(StringUtils.equals(eventType, "follow")) {
+						
+						this.followEvent(event, channelToken);
+						
+						//被封鎖時
+					} else if(StringUtils.equals(eventType, "unfollow")) {
+						
+						
+						
+						//message
+					} else if(StringUtils.equals(eventType, "message")) {
+						
+						this.messageEvent(event, channelToken);
+						
+						//機器人被加入群組/聊天室
+					} else if(StringUtils.equals(eventType, "join")) {
+						
+						
+						
+						//機器人已離開群組/聊天室
+					} else if(StringUtils.equals(eventType, "leave")) {
+						
+						
+						
+						//使用者加入群組/聊天室	
+					} else if(StringUtils.equals(eventType, "memberJoined")) {
+						
+						
+						
+						//使用者加入群組/聊天室	
+					} else if(StringUtils.equals(eventType, "memberLeft")) {
+						
+						
+						//使用者點選quickReply回傳的資料
+					} else if(StringUtils.equals(eventType, "postback")) {
+						
+						this.postbackEvent(event, channelToken);
+						
+					}
 				}
+				
 				
 			}
 		}

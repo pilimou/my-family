@@ -16,6 +16,9 @@ public class FridgeItemProcessor implements ItemProcessor<FridgeEntity, FridgeEn
 	
 	@Value("${lineBot.nike.channelToken}")
 	private String channelToken;
+	
+	@Value("${lineBot.family.groupId}")
+	private String family_groupId;
 
 	@Override
 	public FridgeEntity process(FridgeEntity item) throws Exception {
@@ -33,7 +36,7 @@ public class FridgeItemProcessor implements ItemProcessor<FridgeEntity, FridgeEn
 		newItem.setState("即將過期");		
 		String[] messages = {item.getLineUserName() + " 買的 " 
 				+ item.getItemName() + " 保存期限 " + item.getExpirationDateStr() + " 即將過期 "};
-		String replyJson = SendMessage.replyMessageTextJson("to", "Uaae19ff20461f35d3db44135adfe2e56", messages);
+		String replyJson = SendMessage.replyMessageTextJson("to", family_groupId, messages);
 		logger.info("sendMessage = {}", replyJson);
 		SendMessage.pushMessage(replyJson, channelToken);
 

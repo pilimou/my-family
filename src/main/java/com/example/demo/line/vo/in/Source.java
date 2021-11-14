@@ -5,6 +5,8 @@ public class Source {
 	private String type;
 	
 	private String userId;
+	
+	private String groupId;
 
 	public String getType() {
 		return type;
@@ -20,6 +22,14 @@ public class Source {
 
 	public void setUserId(String userId) {
 		this.userId = userId;
+	}
+
+	public String getGroupId() {
+		return groupId;
+	}
+
+	public void setGroupId(String groupId) {
+		this.groupId = groupId;
 	}
 	
 	

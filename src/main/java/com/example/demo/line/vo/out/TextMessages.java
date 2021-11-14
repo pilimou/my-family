@@ -1,7 +1,9 @@
 package com.example.demo.line.vo.out;
 
 import com.example.demo.line.vo.out.quickreply.QuickReply;
+import com.fasterxml.jackson.annotation.JsonInclude;
 
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class TextMessages {
 	
 	private String type;

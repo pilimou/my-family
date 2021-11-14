@@ -2,3 +2,8 @@ lineBot:
   nike:
     channelToken: ${sm://nike-channelToken}
     channelSecret: ${sm://nike-channelSecret}
+  test:
+    channelToken: ${sm://test-channelToken}
+    channelSecret: ${sm://test-channelSecret}
+  family:
+    groupId: ${sm://family-groupId-nike}

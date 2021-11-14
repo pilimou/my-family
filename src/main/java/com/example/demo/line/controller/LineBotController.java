@@ -29,6 +29,12 @@ public class LineBotController {
 	@Value("${lineBot.nike.channelToken}")
 	private String channelToken;
 	
+//	@Value("${lineBot.test.channelSecret}")
+//	private String channelSecret;
+//	
+//	@Value("${lineBot.test.channelToken}")
+//	private String channelToken;
+	
 	@Autowired
 	private VerificationLineService verificationLineService;
 	
