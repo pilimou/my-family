@@ -1,31 +1,35 @@
-package com.example.demo.line.service.impl;
+package com.example.demo.line.service.nike;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.threeten.bp.LocalDateTime;
 import org.threeten.bp.format.DateTimeFormatter;
 
 import com.example.demo.line.entity.FridgeEntity;
 import com.example.demo.line.repository.FridgeRepository;
-import com.example.demo.line.service.LineMessageService;
-import com.example.demo.line.service.MessageEventService;
+import com.example.demo.line.service.BasicLineMessageEvent;
 import com.example.demo.line.vo.in.Events;
-import com.example.demo.line.vo.in.LineMessageIn;
+import com.example.demo.line.vo.out.flexmessage.FlexBody;
+import com.example.demo.line.vo.out.flexmessage.FlexBodyContents;
+import com.example.demo.line.vo.out.flexmessage.FlexContents;
+import com.example.demo.line.vo.out.flexmessage.FlexHero;
+import com.example.demo.line.vo.out.flexmessage.FlexMessages;
+import com.example.demo.line.vo.out.flexmessage.PushFlex;
+import com.example.demo.line.vo.out.quickreply.Action;
 import com.example.demo.utils.CommonTool;
 import com.example.demo.utils.SendMessage;
 import com.example.demo.web.entity.AppUserEntity;
 import com.example.demo.web.repository.AppUserRepository;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 @Service
-public class LineMessageServiceImpl implements LineMessageService, MessageEventService{
+public class LineNikeMessageService extends BasicLineMessageEvent{
 	
 	private Logger logger = LoggerFactory.getLogger(this.getClass());
 	
@@ -36,69 +40,11 @@ public class LineMessageServiceImpl implements LineMessageService, MessageEventS
 	
 	@Autowired
 	private AppUserRepository appUserRepository;
-
-	@Override
-	public ResponseEntity<String> processLineMessage(LineMessageIn lineMessageIn, String channelToken) {
-		String eventType = null;
-		for(Events event : lineMessageIn.getEvents()) {
-			if (null != event && null != event.getType()) {
-				eventType = event.getType();
-				//群組
-				if(null != event.getSource() && StringUtils.equals("group", event.getSource().getType())) {
-					return new ResponseEntity<String>(HttpStatus.OK);
-				//個人	
-				} else if(null != event.getSource() && StringUtils.equals("user", event.getSource().getType())) {
-					
-					//被加好友時
-					if(StringUtils.equals(eventType, "follow")) {
-						
-						this.followEvent(event, channelToken);
-						
-						//被封鎖時
-					} else if(StringUtils.equals(eventType, "unfollow")) {
-						
-						
-						
-						//message
-					} else if(StringUtils.equals(eventType, "message")) {
-						
-						this.messageEvent(event, channelToken);
-						
-						//機器人被加入群組/聊天室
-					} else if(StringUtils.equals(eventType, "join")) {
-						
-						
-						
-						//機器人已離開群組/聊天室
-					} else if(StringUtils.equals(eventType, "leave")) {
-						
-						
-						
-						//使用者加入群組/聊天室	
-					} else if(StringUtils.equals(eventType, "memberJoined")) {
-						
-						
-						
-						//使用者加入群組/聊天室	
-					} else if(StringUtils.equals(eventType, "memberLeft")) {
-						
-						
-						//使用者點選quickReply回傳的資料
-					} else if(StringUtils.equals(eventType, "postback")) {
-						
-						this.postbackEvent(event, channelToken);
-						
-					}
-				}
-				
-				
-			}
-		}
-		return null;
-	}
+	
 	
 	//被加好友時
-	private void followEvent(Events event, String channelToken) {
+	@Override
+	protected void followEvent(Events event, String channelToken) {
 		if(StringUtils.isNoneBlank(event.getSource().getUserId())) {
 			AppUserEntity appUserEntity = appUserRepository.findByLineUserId(event.getSource().getUserId());
 			if(null == appUserEntity) {
@@ -120,68 +66,9 @@ public class LineMessageServiceImpl implements LineMessageService, MessageEventS
 		}
 	}
 	
-	
-	private void messageEvent(Events event, String channelToken) {
-		String messageType = null;
-		if(null != event.getMessage() && null != event.getMessage().getType()) {
-			messageType = event.getMessage().getType();
-			
-			//文字
-			if(StringUtils.equals(messageType, "text")) {
-		
-				this.messageEventText(event, channelToken);
-			
-			//照片	
-			} else if(StringUtils.equals(messageType, "image")) {
-				
-			
-				
-			//影片
-			} else if(StringUtils.equals(messageType, "video")) {
-				
-			
-				
-			//audio
-			} else if(StringUtils.equals(messageType, "audio")) {
-				
-			
-				
-			//檔案
-			} else if(StringUtils.equals(messageType, "file")) {
-				
-			
-				
-			//location
-			} else if(StringUtils.equals(messageType, "location")) {
-				
-			
-				
-			//貼圖
-			} else if(StringUtils.equals(messageType, "sticker")) {
-				
-			
-				
-			}
-		}
-	}
-	
-	//使用者點選quickReply回傳的資料
-	private void postbackEvent(Events event, String channelToken) {
-		if(null != event.getPostback() && null != event.getPostback().getData()) {
-			FridgeEntity fridgeEntity = this.getFridgeEntity(event);
-			fridgeRepository.save(fridgeEntity);
-			String[] message = {"已存檔"}; 
-			try {
-				String replyJson = SendMessage.replyMessageTextJson("reply",event.getReplyToken(), message);
-				SendMessage.replyMessage(replyJson, channelToken);
-			} catch (Exception e) {
-				logger.error(e.getMessage(), e);
-			}
-		}
-	}
-
+	//文字
 	@Override
-	public void messageEventText(Events event, String channelToken){
+	protected void messageEventText(Events event, String channelToken) {
 		//第一位轉半形
 		String text = event.getMessage().getText().substring(0, 1);
 		text = CommonTool.todbc(text);
@@ -200,13 +87,17 @@ public class LineMessageServiceImpl implements LineMessageService, MessageEventS
 					this.setNickName(event, channelToken, replyData, appUserEntity);
 				}
 				
+			} else if(replyData.contains(" ") && replyData.split(" ")[0].trim().equals("刪除")) {
+				//刪除該物品保存期限最近的一筆
+				this.deleteFridgeEntity(event, channelToken, replyData);
+		
 			} else if(StringUtils.equals(replyData, "冰箱")){
 				//回複網頁URL
 				this.sendWebURL(event, channelToken, replyData);
 			} else if(StringUtils.equals(replyData, "指令")){
 				//回複目前指令
 				this.sendCommand(event, channelToken, replyData);
-			} else {
+			} else if(!StringUtils.equals(replyData, "刪除")){
 				//如果資料庫有帳號但是還沒設定暱稱 
 				if(null != appUserEntity && null == appUserEntity.getLineUserName()) {
 					//發訊息請使用者設定暱稱
@@ -220,7 +111,6 @@ public class LineMessageServiceImpl implements LineMessageService, MessageEventS
 			}
 			
 		}
-		
 	}
 	
 	//發訊息請使用者設定暱稱
@@ -249,6 +139,22 @@ public class LineMessageServiceImpl implements LineMessageService, MessageEventS
 		}
 	}
 	
+	//使用者點選quickReply回傳的資料
+	@Override
+	protected void postbackEvent(Events event, String channelToken) {
+		if(null != event.getPostback() && null != event.getPostback().getData()) {
+			FridgeEntity fridgeEntity = this.getFridgeEntity(event);
+			fridgeRepository.save(fridgeEntity);
+			String[] message = {"已存檔"}; 
+			try {
+				String replyJson = SendMessage.replyMessageTextJson("reply",event.getReplyToken(), message);
+				SendMessage.replyMessage(replyJson, channelToken);
+			} catch (Exception e) {
+				logger.error(e.getMessage(), e);
+			}
+		}
+	}
+	
 	//已有暱稱 就直接回quickReply讓使用者點選保存期限
 	private void sendQuickReply(Events event, String channelToken, String replyData, AppUserEntity appUserEntity) {
 		String replyText = "請選擇保存期限";
@@ -263,9 +169,13 @@ public class LineMessageServiceImpl implements LineMessageService, MessageEventS
 	//發送網頁URL
 	private void sendWebURL(Events event, String channelToken, String replyData) {
 		try {
-			String[] replyText = {"請至網頁查看", "https://newfamily1113-007-2ufd6oyakq-uc.a.run.app/home/body"};
-			String replyJson = SendMessage.replyMessageTextJson("reply", event.getReplyToken(), replyText);
-			SendMessage.replyMessage(replyJson, channelToken);
+			//flex message
+			String myCard = this.getWeb_URI_FlexJson(event.getSource().getUserId());
+			SendMessage.pushMessage(myCard, channelToken);
+			//單純回復訊息
+//			String[] replyText = {"請至網頁查看", "https://newfamily1113-007-2ufd6oyakq-uc.a.run.app/home/body"};
+//			String replyJson = SendMessage.replyMessageTextJson("reply", event.getReplyToken(), replyText);
+//			SendMessage.replyMessage(replyJson, channelToken);
 		} catch (Exception e) {
 			logger.error(e.getMessage(), e);
 		}
@@ -282,6 +192,26 @@ public class LineMessageServiceImpl implements LineMessageService, MessageEventS
 		}
 	}
 	
+	//刪除該物品保存期限最近的一筆
+	private void deleteFridgeEntity(Events event, String channelToken, String replyData) {
+		String replyJson = null;
+		try {
+			FridgeEntity deleteEntity =  fridgeRepository.findTopByItemNameOrderByExpirationDateStrAsc(replyData.split(" ")[1].trim());
+			if(null != deleteEntity) {
+				fridgeRepository.delete(deleteEntity);
+				replyJson = SendMessage.replyMessageTextJson("reply", event.getReplyToken(), new String[] {deleteEntity.getItemName() + " 保存期限 " + deleteEntity.getExpirationDateStr() + " 已刪除"});
+			} else {
+				replyJson = SendMessage.replyMessageTextJson("reply", event.getReplyToken(), new String[] {"刪除失敗 該物品無紀錄!"});
+			}
+			SendMessage.replyMessage(replyJson, channelToken);
+		} catch (Exception e) {
+			logger.error(e.getMessage(), e);
+		}
+		
+		
+	}
+	
+	
 	//處理要存入db的entity
 	private FridgeEntity getFridgeEntity(Events event) {
 		AppUserEntity appUserEntity = appUserRepository.findByLineUserId(event.getSource().getUserId());
@@ -295,41 +225,49 @@ public class LineMessageServiceImpl implements LineMessageService, MessageEventS
 		return fridgeEntity;
 	}
 	
-	@Override
-	public void messageEventImage(Events event, String channelToken) {
+	//flex message json
+	private String getWeb_URI_FlexJson(String pushToken) throws Exception{
+		Action action = new Action();
+		action.setType("uri");
+		action.setLabel("冰箱網頁連結");
+		action.setUri("https://newfamily1113-007-2ufd6oyakq-uc.a.run.app/home/body");
 		
-	}
-
-
-	@Override
-	public void messageEventVideo(Events event, String channelToken) {
+		List<FlexBodyContents> flexBodyContentsList = new ArrayList<>();
+		FlexBodyContents flexBodyContents = new FlexBodyContents();
+		flexBodyContents.setType("button");
+		flexBodyContents.setAction(action);
+		flexBodyContents.setOffsetTop("none");
+		flexBodyContents.setStyle("link");
+		flexBodyContentsList.add(flexBodyContents);
 		
-	}
-
-
-	@Override
-	public void messageEventAudio(Events event, String channelToken) {
+		FlexBody flexBody = new FlexBody();
+		flexBody.setType("box");
+		flexBody.setLayout("vertical");
+		flexBody.setContents(flexBodyContentsList);
 		
-	}
-
-
-	@Override
-	public void messageEventFile(Events event, String channelToken) {
+		FlexHero flexHero = new FlexHero();
+		flexHero.setType("image");
+		flexHero.setUrl("https://scontent.ftpe11-2.fna.fbcdn.net/v/t39.30808-6/255650310_4999619113400103_324230386128075232_n.jpg?_nc_cat=105&ccb=1-5&_nc_sid=730e14&_nc_ohc=e69cM6q7xgEAX95teI-&_nc_ht=scontent.ftpe11-2.fna&oh=04ea75872d36a0ee8bcf9ad487972953&oe=6199205F");
+		flexHero.setSize("full");
+		flexHero.setAspectMode("cover");
 		
-	}
-
-
-	@Override
-	public void messageEventLocation(Events event, String channelToken) {
+		FlexContents flexContents = new FlexContents();
+		flexContents.setHero(flexHero);
+		flexContents.setBody(flexBody);
+		flexContents.setType("bubble");
 		
-	}
-
-
-	@Override
-	public void messageEventSticker(Events event, String channelToken) {
+		List<FlexMessages> flexmessagesList = new ArrayList<>();
+		FlexMessages flexMessages = new FlexMessages();
+		flexMessages.setType("flex");
+		flexMessages.setAltText("This is a Flex Message");
+		flexMessages.setContents(flexContents);
+		flexmessagesList.add(flexMessages);
 		
+		PushFlex pushFlex = new PushFlex();
+		pushFlex.setTo(pushToken);
+		pushFlex.setMessages(flexmessagesList);
+		
+		
+		return new ObjectMapper().writeValueAsString(pushFlex);
 	}
-	
-	
-
 }

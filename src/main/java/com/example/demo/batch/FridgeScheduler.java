@@ -8,7 +8,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
-@Component
 public class FridgeScheduler {
 	
 	@Autowired
@@ -17,7 +16,7 @@ public class FridgeScheduler {
 	@Autowired
 	Job updateUserJob;
 	
-	 @Scheduled(cron = "0 0 12 * * ?")
+	
 	  public void launchJob1() throws Exception {
 	      JobParameters jobParameters = new JobParametersBuilder()
 	              .addLong("time", System.currentTimeMillis())

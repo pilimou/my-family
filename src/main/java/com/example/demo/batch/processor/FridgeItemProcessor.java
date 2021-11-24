@@ -9,7 +9,6 @@ import org.springframework.stereotype.Component;
 import com.example.demo.line.entity.FridgeEntity;
 import com.example.demo.utils.SendMessage;
 
-@Component
 public class FridgeItemProcessor implements ItemProcessor<FridgeEntity, FridgeEntity>{
 	
 	private static final Logger logger = LoggerFactory.getLogger(FridgeEntity.class);
@@ -36,7 +35,7 @@ public class FridgeItemProcessor implements ItemProcessor<FridgeEntity, FridgeEn
 		newItem.setState("即將過期");		
 		String[] messages = {item.getLineUserName() + " 買的 " 
 				+ item.getItemName() + " 保存期限 " + item.getExpirationDateStr() + " 即將過期 "};
-		String replyJson = SendMessage.replyMessageTextJson("to", family_groupId, messages);
+		String replyJson = SendMessage.replyMessageTextJson("to", "family_groupId", messages);
 		logger.info("sendMessage = {}", replyJson);
 		SendMessage.pushMessage(replyJson, channelToken);
 

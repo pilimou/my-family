@@ -1,5 +1,8 @@
 package com.example.demo.line.vo.out.quickreply;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
+
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class Action {
 	
 	private String type; 
@@ -9,6 +12,7 @@ public class Action {
 	private String initial;
 	private String max;
 	private String min;
+	private String uri;
 	
 	public String getType() {
 		return type;
@@ -51,6 +55,12 @@ public class Action {
 	}
 	public void setMin(String min) {
 		this.min = min;
+	}
+	public String getUri() {
+		return uri;
+	}
+	public void setUri(String uri) {
+		this.uri = uri;
 	}
 	
 	
