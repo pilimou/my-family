@@ -6,7 +6,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -15,7 +14,7 @@ import org.springframework.web.client.RestClientException;
 
 import com.example.demo.line.service.VerificationLineService;
 import com.example.demo.line.service.nike.LineNikeMessageService;
-import com.example.demo.line.tasks.ProcessExpirationService;
+import com.example.demo.line.tasks.service.ProcessExpirationService;
 import com.example.demo.line.vo.in.LineMessageIn;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -123,14 +122,4 @@ public class LineBotController {
 		return new ResponseEntity<String>(HttpStatus.OK);
 	}
 	
-	//定時任務
-	@Scheduled(cron = "0 0 12 * * ?")
-	public void pushExpirationMessage() {
-		try {
-			processExpirationService.pushExpirationMessage();
-		} catch(Exception e) {
-			logger.error("pushExpirationMessage Error " , e.getMessage());
-		}
-	}
-
 }

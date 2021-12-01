@@ -1,4 +1,4 @@
-package com.example.demo.line.tasks.impl;
+package com.example.demo.line.tasks.service.impl;
 
 import java.util.List;
 
@@ -15,7 +15,7 @@ import org.threeten.bp.format.DateTimeFormatter;
 
 import com.example.demo.line.entity.FridgeEntity;
 import com.example.demo.line.repository.FridgeRepository;
-import com.example.demo.line.tasks.ProcessExpirationService;
+import com.example.demo.line.tasks.service.ProcessExpirationService;
 import com.example.demo.utils.SendMessage;
 
 @Service

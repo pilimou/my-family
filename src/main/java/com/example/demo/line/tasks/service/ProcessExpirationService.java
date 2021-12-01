@@ -1,4 +1,4 @@
-package com.example.demo.line.tasks;
+package com.example.demo.line.tasks.service;
 
 public interface ProcessExpirationService {
 	
