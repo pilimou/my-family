@@ -39,8 +39,8 @@
 
 
 # 使用工具
-[SpringBoot](https://spring.io/projects/spring-boot)
-[Line Message API](https://developers.line.biz/en/docs/messaging-api/overview/)
-[GCP](https://console.cloud.google.com/)
-[MongoDB](https://www.mongodb.com/)
-[Docker](https://www.docker.com/)
+* [SpringBoot](https://spring.io/projects/spring-boot)
+* [Line Message API](https://developers.line.biz/en/docs/messaging-api/overview/)
+* [GCP](https://console.cloud.google.com/)
+* [MongoDB](https://www.mongodb.com/)
+* [Docker](https://www.docker.com/)
