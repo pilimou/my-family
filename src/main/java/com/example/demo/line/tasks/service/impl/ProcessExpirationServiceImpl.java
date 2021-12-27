@@ -15,8 +15,8 @@ import org.threeten.bp.format.DateTimeFormatter;
 
 import com.example.demo.line.entity.FridgeEntity;
 import com.example.demo.line.repository.FridgeRepository;
+import com.example.demo.line.service.SendMessageService;
 import com.example.demo.line.tasks.service.ProcessExpirationService;
-import com.example.demo.utils.SendMessage;
 
 @Service
 public class ProcessExpirationServiceImpl implements ProcessExpirationService{
@@ -29,6 +29,9 @@ public class ProcessExpirationServiceImpl implements ProcessExpirationService{
 	@Autowired
 	private FridgeRepository fridgeRepository;
 	
+	@Autowired
+	private SendMessageService sendMessageService;
+	
 	@Value("${lineBot.nike.channelToken}")
 	private String channelToken;
 	
@@ -38,18 +41,21 @@ public class ProcessExpirationServiceImpl implements ProcessExpirationService{
 	@Override
 	public void pushExpirationMessage() throws Exception{
 		Query query = new Query();
+		String str = "";
 		query.addCriteria(Criteria.where("expirationDateStr").lte(LocalDateTime.now().plusDays(7).format(DateTimeFormatter.ofPattern("yyyy-MM-dd"))));
 		List<FridgeEntity> fridgeEntityList = mongoTemplate.find(query, FridgeEntity.class);
 		if(!fridgeEntityList.isEmpty()) {
 			for(FridgeEntity vo : fridgeEntityList) {
 				vo.setState("即將過期");
-				String[] messages = {vo.getLineUserName() + " 買的 " 
-						+ vo.getItemName() + " 保存期限 " + vo.getExpirationDateStr() + " 即將過期 "};
-				String replyJson = SendMessage.replyMessageTextJson("to", family_groupId, messages);
-				logger.info("sendMessage = {}", replyJson);
-				SendMessage.pushMessage(replyJson, channelToken);
+				str += vo.getLineUserName() + " 買的 " 
+						+ vo.getItemName() + " 保存期限 " + vo.getExpirationDateStr() + " 即將過期 " + "\n";
 			}
+			String[] messages = {str};
+			String replyJson = sendMessageService.replyMessageTextJson("to", family_groupId, messages);
+			sendMessageService.pushMessage(replyJson, channelToken);
 			fridgeRepository.saveAll(fridgeEntityList);
+		} else {
+			logger.info("No item expiration");
 		}
 		
 

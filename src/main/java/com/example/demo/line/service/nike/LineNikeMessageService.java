@@ -14,6 +14,7 @@ import org.threeten.bp.format.DateTimeFormatter;
 import com.example.demo.line.entity.FridgeEntity;
 import com.example.demo.line.repository.FridgeRepository;
 import com.example.demo.line.service.BasicLineMessageEvent;
+import com.example.demo.line.service.SendMessageService;
 import com.example.demo.line.vo.in.Events;
 import com.example.demo.line.vo.out.flexmessage.FlexBody;
 import com.example.demo.line.vo.out.flexmessage.FlexBodyContents;
@@ -23,7 +24,6 @@ import com.example.demo.line.vo.out.flexmessage.FlexMessages;
 import com.example.demo.line.vo.out.flexmessage.PushFlex;
 import com.example.demo.line.vo.out.quickreply.Action;
 import com.example.demo.utils.CommonTool;
-import com.example.demo.utils.SendMessage;
 import com.example.demo.web.entity.AppUserEntity;
 import com.example.demo.web.repository.AppUserRepository;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -41,6 +41,9 @@ public class LineNikeMessageService extends BasicLineMessageEvent{
 	@Autowired
 	private AppUserRepository appUserRepository;
 	
+	@Autowired
+	private SendMessageService sendMessageService;
+	
 	
 	//被加好友時
 	@Override
@@ -55,8 +58,8 @@ public class LineNikeMessageService extends BasicLineMessageEvent{
 				String[] messages = {"你也不想努力了嗎?", "請先設定您的暱稱，輸入", "!暱稱 XXXX", "XXXX為您想要設定的暱稱"};
 				String replyJson;
 				try {
-					replyJson = SendMessage.replyMessageTextJson("to", event.getSource().getUserId(), messages);
-					SendMessage.pushMessage(replyJson, channelToken);
+					replyJson = sendMessageService.replyMessageTextJson("to", event.getSource().getUserId(), messages);
+					sendMessageService.pushMessage(replyJson, channelToken);
 				} catch (Exception e) {
 					logger.error(e.getMessage(), e);
 				}
@@ -120,8 +123,8 @@ public class LineNikeMessageService extends BasicLineMessageEvent{
 		appUserRepository.save(appUserEntity);
 		try {
 			String[] replyText = {replyData.split(" ")[1] + " 已儲存!", "可以輸入", "!指令", "來查看可用命令"};
-			String replyJson = SendMessage.replyMessageTextJson("reply", event.getReplyToken(), replyText);
-			SendMessage.replyMessage(replyJson, channelToken);
+			String replyJson = sendMessageService.replyMessageTextJson("reply", event.getReplyToken(), replyText);
+			sendMessageService.replyMessage(replyJson, channelToken);
 		} catch (Exception e) {
 			logger.error(e.getMessage(), e);
 		}
@@ -132,8 +135,8 @@ public class LineNikeMessageService extends BasicLineMessageEvent{
 	private void sendMessageToSetNickName(Events event, String channelToken, String replyData, AppUserEntity appUserEntity) {
 		try {
 			String[] replyText = {"請先設定暱稱! 輸入", "!暱稱 XXXX", "XXXX為您想要設定的暱稱"};
-			String replyJson = SendMessage.replyMessageTextJson("reply", event.getReplyToken(), replyText);
-			SendMessage.replyMessage(replyJson, channelToken);
+			String replyJson = sendMessageService.replyMessageTextJson("reply", event.getReplyToken(), replyText);
+			sendMessageService.replyMessage(replyJson, channelToken);
 		} catch (Exception e) {
 			logger.error(e.getMessage(), e);
 		}
@@ -147,8 +150,8 @@ public class LineNikeMessageService extends BasicLineMessageEvent{
 			fridgeRepository.save(fridgeEntity);
 			String[] message = {"已存檔"}; 
 			try {
-				String replyJson = SendMessage.replyMessageTextJson("reply",event.getReplyToken(), message);
-				SendMessage.replyMessage(replyJson, channelToken);
+				String replyJson = sendMessageService.replyMessageTextJson("reply",event.getReplyToken(), message);
+				sendMessageService.replyMessage(replyJson, channelToken);
 			} catch (Exception e) {
 				logger.error(e.getMessage(), e);
 			}
@@ -159,8 +162,8 @@ public class LineNikeMessageService extends BasicLineMessageEvent{
 	private void sendQuickReply(Events event, String channelToken, String replyData, AppUserEntity appUserEntity) {
 		String replyText = "請選擇保存期限";
 		try {
-			String replyJson = SendMessage.quickReplyMessageTextJson_dateTime(event.getReplyToken(), replyText, replyData);
-			SendMessage.replyMessage(replyJson, channelToken);
+			String replyJson = sendMessageService.quickReplyMessageTextJson_dateTime(event.getReplyToken(), replyText, replyData);
+			sendMessageService.replyMessage(replyJson, channelToken);
 		} catch (Exception e) {
 			logger.error(e.getMessage(), e);
 		}	
@@ -171,7 +174,7 @@ public class LineNikeMessageService extends BasicLineMessageEvent{
 		try {
 			//flex message
 			String myCard = this.getWeb_URI_FlexJson(event.getSource().getUserId());
-			SendMessage.pushMessage(myCard, channelToken);
+			sendMessageService.pushMessage(myCard, channelToken);
 			//單純回復訊息
 //			String[] replyText = {"請至網頁查看", "https://newfamily1113-007-2ufd6oyakq-uc.a.run.app/home/body"};
 //			String replyJson = SendMessage.replyMessageTextJson("reply", event.getReplyToken(), replyText);
@@ -185,8 +188,8 @@ public class LineNikeMessageService extends BasicLineMessageEvent{
 	private void sendCommand(Events event, String channelToken, String replyData) {
 		try {
 			String[] replyText = {"修改暱稱 !暱稱 XXXX", "查看冰箱 !冰箱", "紀錄東西到冰箱 !XX"};
-			String replyJson = SendMessage.replyMessageTextJson("reply", event.getReplyToken(), replyText);
-			SendMessage.replyMessage(replyJson, channelToken);
+			String replyJson = sendMessageService.replyMessageTextJson("reply", event.getReplyToken(), replyText);
+			sendMessageService.replyMessage(replyJson, channelToken);
 		} catch (Exception e) {
 			logger.error(e.getMessage(), e);
 		}
@@ -199,11 +202,11 @@ public class LineNikeMessageService extends BasicLineMessageEvent{
 			FridgeEntity deleteEntity =  fridgeRepository.findTopByItemNameOrderByExpirationDateStrAsc(replyData.split(" ")[1].trim());
 			if(null != deleteEntity) {
 				fridgeRepository.delete(deleteEntity);
-				replyJson = SendMessage.replyMessageTextJson("reply", event.getReplyToken(), new String[] {deleteEntity.getItemName() + " 保存期限 " + deleteEntity.getExpirationDateStr() + " 已刪除"});
+				replyJson = sendMessageService.replyMessageTextJson("reply", event.getReplyToken(), new String[] {deleteEntity.getItemName() + " 保存期限 " + deleteEntity.getExpirationDateStr() + " 已刪除"});
 			} else {
-				replyJson = SendMessage.replyMessageTextJson("reply", event.getReplyToken(), new String[] {"刪除失敗 該物品無紀錄!"});
+				replyJson = sendMessageService.replyMessageTextJson("reply", event.getReplyToken(), new String[] {"刪除失敗 該物品無紀錄!"});
 			}
-			SendMessage.replyMessage(replyJson, channelToken);
+			sendMessageService.replyMessage(replyJson, channelToken);
 		} catch (Exception e) {
 			logger.error(e.getMessage(), e);
 		}

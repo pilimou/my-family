@@ -7,9 +7,5 @@ lineBot:
     channelSecret: ${sm://test-channelSecret}
   family:
     groupId: ${sm://family-groupId-nike}
-
-loggin:
-  level: 
-    com.example.demo.line.tasks: trace
   
   
