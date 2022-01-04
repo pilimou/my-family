@@ -1,5 +1,7 @@
 package com.example.demo.line.service.nike;
 
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -8,8 +10,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.threeten.bp.LocalDateTime;
-import org.threeten.bp.format.DateTimeFormatter;
 
 import com.example.demo.line.entity.FridgeEntity;
 import com.example.demo.line.repository.FridgeRepository;
@@ -233,7 +233,7 @@ public class LineNikeMessageService extends BasicLineMessageEvent{
 		Action action = new Action();
 		action.setType("uri");
 		action.setLabel("冰箱網頁連結");
-		action.setUri("https://newfamily1113-007-2ufd6oyakq-uc.a.run.app/home/body");
+		action.setUri("https://pilimou2021.herokuapp.com/home/body");
 		
 		List<FlexBodyContents> flexBodyContentsList = new ArrayList<>();
 		FlexBodyContents flexBodyContents = new FlexBodyContents();
