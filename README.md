@@ -43,4 +43,3 @@
 * [Line Message API](https://developers.line.biz/en/docs/messaging-api/overview/)
 * [heroku](https://dashboard.heroku.com/)
 * [MongoDB](https://www.mongodb.com/)
-* [Docker](https://www.docker.com/)
