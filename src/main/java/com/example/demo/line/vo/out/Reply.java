@@ -3,9 +3,11 @@ package com.example.demo.line.vo.out;
 import java.util.List;
 
 import com.example.demo.line.vo.out.quickreply.QReply;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class Reply {
 	
 	private String to;

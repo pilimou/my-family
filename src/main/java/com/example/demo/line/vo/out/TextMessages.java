@@ -1,9 +1,11 @@
 package com.example.demo.line.vo.out;
 
 import com.example.demo.line.vo.out.quickreply.QuickReply;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class TextMessages {
 	
 	private String type;
